@@ -1,0 +1,47 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Compiled files
+*.obj
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.lib
+*.exp
+*.idb
+*.ipch
+*.log
+
+# IntelliSense / Browse
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.VC.opendb
+
+# Copilot indices
+CopilotIndices/
+
+# tlog files
+*.tlog
+
+# Other
+*.cache
+*.ncb
+*.opensdf
+*.sdf
+Thumbs.db
