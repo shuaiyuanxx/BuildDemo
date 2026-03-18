@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- WSLC Container Image Declarations -->
+  <ItemGroup>
+    <WslcImage Include="echo-server"
+               Dockerfile="$(ProjectDir)..\TestApp\container\server\Dockerfile"
+               Context="$(ProjectDir)..\TestApp\container\server"
+               Tag="cs-echo-server:latest"
+               Sources="$(ProjectDir)..\TestApp\container\server" />
+    <WslcImage Include="uppercase-worker"
+               Dockerfile="$(ProjectDir)..\TestApp\container\worker\Dockerfile"
+               Context="$(ProjectDir)..\TestApp\container\worker"
+               Tag="cs-uppercase-worker:latest"
+               Sources="$(ProjectDir)..\TestApp\container\worker" />
+  </ItemGroup>
+
+  <Import Project="$(ProjectDir)..\WslcBuildImage.targets" />
+
+</Project>

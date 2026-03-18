@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="WinClient.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -28,6 +28,5 @@
     <None Include="container\worker\worker.cpp">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="WslcBuildImage.targets" />
   </ItemGroup>
 </Project>

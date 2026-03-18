@@ -24,7 +24,7 @@
     <ProjectGuid>{23d572a6-f95c-40c5-84bb-9a11c53c8e8d}</ProjectGuid>
     <RootNamespace>TestApp</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>WinClient</ProjectName>
+    <ProjectName>CppClient</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -125,7 +125,7 @@
   </ItemDefinitionGroup>
   <!-- Source files -->
   <ItemGroup>
-    <ClCompile Include="WinClient.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <!-- Container source files visible in Solution Explorer -->
   <ItemGroup>
@@ -133,7 +133,6 @@
     <None Include="container\server\server.cpp" />
     <None Include="container\worker\Dockerfile" />
     <None Include="container\worker\worker.cpp" />
-    <None Include="WslcBuildImage.targets" />
   </ItemGroup>
   <!-- WSLC Container Image Declarations -->
   <ItemGroup>
@@ -141,7 +140,7 @@
     <WslcImage Include="uppercase-worker" Dockerfile="$(ProjectDir)container\worker\Dockerfile" Context="$(ProjectDir)container\worker" Tag="uppercase-worker:latest" Sources="$(ProjectDir)container\worker" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <Import Project="$(ProjectDir)WslcBuildImage.targets" />
+  <Import Project="$(ProjectDir)..\WslcBuildImage.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>

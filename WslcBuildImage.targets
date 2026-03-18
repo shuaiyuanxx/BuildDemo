@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    Multi-image container build targets (Docker).
+    Supports both C++ (.vcxproj) and C# SDK-style (.csproj) projects.
+
+    Required properties per WslcImage item:
+      Include      - Logical name (used in logs and marker files)
+      Dockerfile   - Path to the Dockerfile
+      Context      - Build context directory
+      Sources      - Directory to monitor for changes
+
+    Optional properties:
+      Tag          - Image tag (defaults to <Include>:latest)
+
+    Example:
+      <ItemGroup>
+        <WslcImage Include="my-server"
+                   Dockerfile="path\to\Dockerfile"
+                   Context="path\to\context"
+                   Tag="my-server:latest"
+                   Sources="path\to\src" />
+      </ItemGroup>
+
+    TODO: Replace docker commands with wslc when WSLC SDK is ready.
+  -->
+
+  <!-- ================================================================== -->
+  <!-- Layer 1: VS Fast Up-to-Date Check                                  -->
+  <!--   C# (CPS)  : UpToDateCheckInput / UpToDateCheckBuilt items        -->
+  <!--   C++ (VCProjectEngine) : .tlog files written after build          -->
+  <!-- ================================================================== -->
+
+  <!-- C# SDK-style projects: declarative up-to-date check -->
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' == 'true'">
+    <UpToDateCheckInput Include="%(WslcImage.Sources)\**\*" />
+    <UpToDateCheckBuilt Include="$(IntDir)wslc_%(WslcImage.Identity).marker" />
+  </ItemGroup>
+
+  <!-- ================================================================== -->
+  <!-- Layer 2: MSBuild incremental build (shared by C++ and C#)          -->
+  <!-- ================================================================== -->
+
+  <!-- Apply default Tag if not specified -->
+  <Target Name="_WslcApplyDefaults" BeforeTargets="WslcBuildAllImages">
+    <ItemGroup>
+      <WslcImage Condition="'%(WslcImage.Tag)' == ''">
+        <Tag>%(Identity):latest</Tag>
+      </WslcImage>
+    </ItemGroup>
+  </Target>
+
+  <!-- Validate required properties -->
+  <Target Name="_WslcValidate"
+          BeforeTargets="WslcBuildAllImages"
+          DependsOnTargets="_WslcApplyDefaults"
+          Condition="'@(WslcImage)' != ''">
+
+    <Error Condition="'%(WslcImage.Dockerfile)' == ''"
+           Text="WSLC: [%(WslcImage.Identity)] 'Dockerfile' property is required." />
+
+    <Error Condition="'%(WslcImage.Context)' == ''"
+           Text="WSLC: [%(WslcImage.Identity)] 'Context' property is required." />
+
+    <Error Condition="'%(WslcImage.Sources)' == ''"
+           Text="WSLC: [%(WslcImage.Identity)] 'Sources' property is required for change detection." />
+  </Target>
+
+  <!-- Outer target: iterate over images and dispatch to inner target -->
+  <Target Name="WslcBuildAllImages"
+          AfterTargets="Build"
+          DependsOnTargets="_WslcApplyDefaults;_WslcValidate"
+          Condition="'@(WslcImage)' != ''">
+
+    <MSBuild Projects="$(MSBuildProjectFullPath)"
+             Targets="_WslcBuildSingleImage"
+             Properties="Configuration=$(Configuration);Platform=$(Platform);_WslcName=%(WslcImage.Identity);_WslcTag=%(WslcImage.Tag);_WslcDockerfile=%(WslcImage.Dockerfile);_WslcContext=%(WslcImage.Context);_WslcSources=%(WslcImage.Sources)" />
+  </Target>
+
+  <!-- Collect source files into an item list for incremental check -->
+  <Target Name="_WslcCollectSources" BeforeTargets="_WslcBuildSingleImage">
+    <ItemGroup>
+      <_WslcSourceFiles Include="$(_WslcDockerfile);$(_WslcSources)\**\*" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Inner target: build one image with incremental check -->
+  <Target Name="_WslcBuildSingleImage"
+          DependsOnTargets="_WslcCollectSources"
+          Inputs="@(_WslcSourceFiles)"
+          Outputs="$(IntDir)wslc_$(_WslcName).marker">
+
+    <MakeDir Directories="$(IntDir)" />
+
+    <Message Importance="high"
+             Text="WSLC: Building image '$(_WslcTag)' for $(_WslcName)..." />
+
+    <Exec Command="docker build -t &quot;$(_WslcTag)&quot; -f &quot;$(_WslcDockerfile)&quot; &quot;$(_WslcContext)&quot;"
+          ConsoleToMSBuild="true" />
+
+    <Touch Files="$(IntDir)wslc_$(_WslcName).marker" AlwaysCreate="true" />
+
+    <Message Importance="high"
+             Text="WSLC: [$(_WslcName)] Image '$(_WslcTag)' built successfully." />
+  </Target>
+
+  <!-- ================================================================== -->
+  <!-- Layer 1 (C++ only): Write .tlog files for VCProjectEngine          -->
+  <!-- ================================================================== -->
+
+  <Target Name="_WslcWriteAllTlogs"
+          AfterTargets="WslcBuildAllImages"
+          Condition="'$(UsingMicrosoftNETSdk)' != 'true' AND '@(WslcImage)' != ''">
+
+    <MSBuild Projects="$(MSBuildProjectFullPath)"
+             Targets="_WslcWriteSingleTlog"
+             Properties="Configuration=$(Configuration);Platform=$(Platform);_WslcName=%(WslcImage.Identity);_WslcDockerfile=%(WslcImage.Dockerfile);_WslcSources=%(WslcImage.Sources);_WslcTlogDir=$(TLogLocation)" />
+  </Target>
+
+  <Target Name="_WslcWriteSingleTlog">
+    <ItemGroup>
+      <_WslcTlogInputs Include="$(_WslcDockerfile);$(_WslcSources)\**\*" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <_WslcDockerfileFullPath>$([System.IO.Path]::GetFullPath('$(_WslcDockerfile)'))</_WslcDockerfileFullPath>
+      <_WslcMarkerFullPath>$([System.IO.Path]::GetFullPath('$(IntDir)wslc_$(_WslcName).marker'))</_WslcMarkerFullPath>
+    </PropertyGroup>
+
+    <WriteLinesToFile
+        File="$(_WslcTlogDir)wslc.$(_WslcName).read.1.tlog"
+        Lines="^$(_WslcDockerfileFullPath);@(_WslcTlogInputs->'%(FullPath)')"
+        Overwrite="true"
+        Encoding="Unicode" />
+
+    <WriteLinesToFile
+        File="$(_WslcTlogDir)wslc.$(_WslcName).write.1.tlog"
+        Lines="^$(_WslcDockerfileFullPath);$(_WslcMarkerFullPath)"
+        Overwrite="true"
+        Encoding="Unicode" />
+  </Target>
+
+  <!-- ================================================================== -->
+  <!-- Clean                                                              -->
+  <!-- ================================================================== -->
+
+  <Target Name="WslcCleanImages" AfterTargets="Clean" Condition="'@(WslcImage)' != ''">
+    <Message Importance="high" Text="WSLC: Removing image '%(WslcImage.Tag)'" />
+
+    <Exec Command="docker rmi &quot;%(WslcImage.Tag)&quot; 2>nul || exit 0"
+          IgnoreExitCode="true" />
+
+    <Delete Files="$(IntDir)wslc_%(WslcImage.Identity).marker" />
+
+    <!-- C++ only: clean tlog files -->
+    <Delete Condition="'$(UsingMicrosoftNETSdk)' != 'true'"
+            Files="$(TLogLocation)wslc.%(WslcImage.Identity).read.1.tlog" />
+    <Delete Condition="'$(UsingMicrosoftNETSdk)' != 'true'"
+            Files="$(TLogLocation)wslc.%(WslcImage.Identity).write.1.tlog" />
+  </Target>
+
+</Project>
