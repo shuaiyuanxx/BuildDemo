@@ -15,8 +15,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestWSLCSDK.cpp">
+    <ClCompile Include="WinClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="container\server\Dockerfile" />
+    <None Include="container\server\server.cpp">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="container\worker\Dockerfile" />
+    <None Include="container\worker\worker.cpp">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="WslcBuildImage.targets" />
   </ItemGroup>
 </Project>
