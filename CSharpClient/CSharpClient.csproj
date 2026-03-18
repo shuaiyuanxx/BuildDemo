@@ -8,15 +8,15 @@
   <!-- WSLC Container Image Declarations -->
   <ItemGroup>
     <WslcImage Include="echo-server"
-               Dockerfile="$(ProjectDir)..\TestApp\container\server\Dockerfile"
-               Context="$(ProjectDir)..\TestApp\container\server"
+               Dockerfile="$(ProjectDir)..\CppClient\container\server\Dockerfile"
+               Context="$(ProjectDir)..\CppClient\container\server"
                Tag="cs-echo-server:latest"
-               Sources="$(ProjectDir)..\TestApp\container\server" />
+               Sources="$(ProjectDir)..\CppClient\container\server" />
     <WslcImage Include="uppercase-worker"
-               Dockerfile="$(ProjectDir)..\TestApp\container\worker\Dockerfile"
-               Context="$(ProjectDir)..\TestApp\container\worker"
+               Dockerfile="$(ProjectDir)..\CppClient\container\worker\Dockerfile"
+               Context="$(ProjectDir)..\CppClient\container\worker"
                Tag="cs-uppercase-worker:latest"
-               Sources="$(ProjectDir)..\TestApp\container\worker" />
+               Sources="$(ProjectDir)..\CppClient\container\worker" />
   </ItemGroup>
 
   <Import Project="$(ProjectDir)..\WslcBuildImage.targets" />
