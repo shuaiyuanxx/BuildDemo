@@ -1,4 +1,4 @@
-# TestWSLCSDK
+# BuildDemo
 
 Proof-of-concept for integrating container image builds into the Visual Studio MSBuild pipeline with full incremental build support.
 
