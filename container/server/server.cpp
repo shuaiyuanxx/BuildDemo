@@ -48,7 +48,7 @@ int main()
             send(clientFd, buf, n, 0);
         }
 
-        printf("[SERVER] Client disconnected.\n");
+        printf("[SERVER] Client disconnected--.\n");
         fflush(stdout);
         close(clientFd);
     }

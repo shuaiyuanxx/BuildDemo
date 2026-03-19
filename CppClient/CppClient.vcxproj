@@ -127,17 +127,10 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
-  <!-- Container source files visible in Solution Explorer -->
-  <ItemGroup>
-    <None Include="container\server\Dockerfile" />
-    <None Include="container\server\server.cpp" />
-    <None Include="container\worker\Dockerfile" />
-    <None Include="container\worker\worker.cpp" />
-  </ItemGroup>
   <!-- WSLC Container Image Declarations -->
   <ItemGroup>
-    <WslcImage Include="echo-server" Dockerfile="$(ProjectDir)container\server\Dockerfile" Context="$(ProjectDir)container\server" Tag="echo-server:latest" Sources="$(ProjectDir)container\server" />
-    <WslcImage Include="uppercase-worker" Dockerfile="$(ProjectDir)container\worker\Dockerfile" Context="$(ProjectDir)container\worker" Tag="uppercase-worker:latest" Sources="$(ProjectDir)container\worker" />
+    <WslcImage Include="echo-server" Dockerfile="$(ProjectDir)..\container\server\Dockerfile" Context="$(ProjectDir)..\container\server" Tag="echo-server:latest" Sources="$(ProjectDir)..\container\server" />
+    <WslcImage Include="uppercase-worker" Dockerfile="$(ProjectDir)..\container\worker\Dockerfile" Context="$(ProjectDir)..\container\worker" Tag="uppercase-worker:latest" Sources="$(ProjectDir)..\container\worker" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="$(ProjectDir)..\WslcBuildImage.targets" />

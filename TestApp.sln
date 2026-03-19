@@ -7,6 +7,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppClient", "CppClient\CppC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpClient", "CSharpClient\CSharpClient.csproj", "{4779D319-68A2-406E-8921-1084DEB1B71F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "container", "container", "{B1A2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{A1B2C3D4-0001-4A7B-8C9D-0E1F2A3B4C5D}"
+	ProjectSection(SolutionItems) = preProject
+		container\server\Dockerfile = container\server\Dockerfile
+		container\server\server.cpp = container\server\server.cpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "worker", "worker", "{A1B2C3D4-0002-4A7B-8C9D-0E1F2A3B4C5D}"
+	ProjectSection(SolutionItems) = preProject
+		container\worker\Dockerfile = container\worker\Dockerfile
+		container\worker\worker.cpp = container\worker\worker.cpp
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -44,6 +58,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A1B2C3D4-0001-4A7B-8C9D-0E1F2A3B4C5D} = {B1A2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}
+		{A1B2C3D4-0002-4A7B-8C9D-0E1F2A3B4C5D} = {B1A2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0391210F-6BF8-48A6-9B32-442A6DA185B0}
